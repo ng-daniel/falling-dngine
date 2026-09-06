@@ -187,6 +187,32 @@ void OpenGLDevice::Render(const RenderData& renderData) {
         if (!command.primitive || !command.primitive->graphicsDeviceData) {
             continue;
         }
+
+        // bind shader program
+        const auto shaderIt = shaderPrograms.find(command.shaderProgram);
+        if (shaderIt == shaderPrograms.end()) {
+            Logger::Error("OpenGLDevice", "Cannot render with shader program " + std::to_string(command.shaderProgram) + " because it does not exist.");
+            continue;
+        }
+        const OpenGLShaderProgram* shaderProgram = shaderIt->second.get();
+        glUseProgram(shaderProgram->programId);
+
+        // set base color texture
+        if (command.material.HasTexture(MaterialTextureSlot::BaseColor)) {
+            const TDEVICE_RID textureId = command.material.textures[static_cast<std::size_t>(MaterialTextureSlot::BaseColor)];
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, textureId);
+        }
+
+        // set orientation/3d space matrix values
+        glUniformMatrix4fv(shaderProgram->modelUniform, 1, GL_FALSE, command.model.Data());
+        glUniformMatrix4fv(shaderProgram->viewUniform, 1, GL_FALSE, renderData.frame.view.Data());
+        glUniformMatrix4fv(shaderProgram->projectionUniform, 1, GL_FALSE, renderData.frame.projection.Data());
+        
+        // retrieve and bind vertex buffers
+        const OpenGLDeviceData* deviceData = static_cast<const OpenGLDeviceData*>(command.primitive->graphicsDeviceData.get());
+        glBindVertexArray(deviceData->VAO);
+        glDrawElements(GL_TRIANGLES, deviceData->indexCount, GL_UNSIGNED_INT, 0);
     }
 }
 

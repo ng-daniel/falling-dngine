@@ -91,10 +91,7 @@ struct RenderSubmission {
 };
 
 /**
- * @brief Values shared by every draw command in a frame.
- *
- * Camera input will populate these in a later stage. They are identity matrices
- * until then.
+ * @brief View and projection matrices for a single frame
  */
 struct FrameUniformData {
     Matrix4 view;

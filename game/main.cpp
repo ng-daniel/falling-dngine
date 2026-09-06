@@ -95,35 +95,43 @@ int main() {
     /// MODEL BUILDER TEST
     /// ---------------------------------------------------------------
     
-    Entity * modelRootEntity = ECSExtras::BuildEntityFromModel(app.GetAssetManager(), ecsManager, GameAssets::RYUJIN7_MODEL.GetUUID());
-    if (modelRootEntity) {
-        Logger::Info("main", "Created model root entity with ID: " + std::to_string(modelRootEntity->entityId) + " and runtime idx: " + std::to_string(modelRootEntity->entityRuntimeIdx));
+    // spawn 100 models in a 10x10 horizontal grid
+
+    for (int x = 0; x < 10; ++x) {
+        for (int z = 0; z < 10; ++z) {
+            for (int y = 0; y < 10; ++y) {
+                Entity * modelRootEntity = ECSExtras::BuildEntityFromModel(app.GetAssetManager(), ecsManager, GameAssets::RYUJIN7_MODEL.GetUUID());
+                if (modelRootEntity) {
+                    Logger::Info("main", "Created model root entity with ID: " + std::to_string(modelRootEntity->entityId) + " and runtime idx: " + std::to_string(modelRootEntity->entityRuntimeIdx));
+                }
+                ecsManager.Parent(*rootEntity, *modelRootEntity);
+                Transform  * modelRootTransform = ecsManager.GetComponent<Transform>(*modelRootEntity);
+                Transform::ChangePosition(
+                    *modelRootTransform,
+                    Vector3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z))
+                );
+                // 90 degree rotation along the Y-axis via quaternions
+                Transform::SetRotation(
+                    *modelRootTransform,
+                    Quaternion::EulerToQuaternion(45.0, 180.0, 30.0)
+                );
+            }
+        }
     }
-    ecsManager.Parent(*rootEntity, *modelRootEntity);
-    Transform  * modelRootTransform = ecsManager.GetComponent<Transform>(*modelRootEntity);
-    Transform::ChangePosition(
-        *modelRootTransform,
-        Vector3(0.0, -1.0, 0.0)
-    );
-    // 90 degree rotation along the Y-axis via quaternions
-    Transform::SetRotation(
-        *modelRootTransform,
-        Quaternion::EulerToQuaternion(45.0, 180.0, 30.0)
-    );
     
-    std::vector<Entity*> children = ecsManager.GetChildren(*modelRootEntity);
-    Logger::Info("main", "Number of children: " + std::to_string(children.size()));
-    for (const Entity* child : children) {
-        Logger::Info("main", "\nChild Entity Name: " + child->name);
+    // std::vector<Entity*> children = ecsManager.GetChildren(*modelRootEntity);
+    // Logger::Info("main", "Number of children: " + std::to_string(children.size()));
+    // for (const Entity* child : children) {
+    //     Logger::Info("main", "\nChild Entity Name: " + child->name);
 
-        Transform childTransform = *ecsManager.GetComponent<Transform>(*child);
-        Logger::Info("main", "Child Local Transform: " + std::to_string(childTransform.GetPosition().x) + ", " + std::to_string(childTransform.GetPosition().y) + ", " + std::to_string(childTransform.GetPosition().z));
-        Logger::Info("main", "Child Local Rotation: " + std::to_string(childTransform.GetRotation().x) + ", " + std::to_string(childTransform.GetRotation().y) + ", " + std::to_string(childTransform.GetRotation().z) + ", " + std::to_string(childTransform.GetRotation().w));
+    //     Transform childTransform = *ecsManager.GetComponent<Transform>(*child);
+    //     Logger::Info("main", "Child Local Transform: " + std::to_string(childTransform.GetPosition().x) + ", " + std::to_string(childTransform.GetPosition().y) + ", " + std::to_string(childTransform.GetPosition().z));
+    //     Logger::Info("main", "Child Local Rotation: " + std::to_string(childTransform.GetRotation().x) + ", " + std::to_string(childTransform.GetRotation().y) + ", " + std::to_string(childTransform.GetRotation().z) + ", " + std::to_string(childTransform.GetRotation().w));
 
-        Transform worldTransform = ecsManager.ComputeWorldTransform(*child);
-        Logger::Info("main", "World Transform: " + std::to_string(worldTransform.GetPosition().x) + ", " + std::to_string(worldTransform.GetPosition().y) + ", " + std::to_string(worldTransform.GetPosition().z));
-        Logger::Info("main", "World Rotation: " + std::to_string(worldTransform.GetRotation().x) + ", " + std::to_string(worldTransform.GetRotation().y) + ", " + std::to_string(worldTransform.GetRotation().z) + ", " + std::to_string(worldTransform.GetRotation().w));
-    }
+    //     Transform worldTransform = ecsManager.ComputeWorldTransform(*child);
+    //     Logger::Info("main", "World Transform: " + std::to_string(worldTransform.GetPosition().x) + ", " + std::to_string(worldTransform.GetPosition().y) + ", " + std::to_string(worldTransform.GetPosition().z));
+    //     Logger::Info("main", "World Rotation: " + std::to_string(worldTransform.GetRotation().x) + ", " + std::to_string(worldTransform.GetRotation().y) + ", " + std::to_string(worldTransform.GetRotation().z) + ", " + std::to_string(worldTransform.GetRotation().w));
+    // }
 
     /// MATERIAL SHADER COMPILATION TEST
     /// ---------------------------------------------------------------

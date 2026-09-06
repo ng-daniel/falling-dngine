@@ -2,6 +2,7 @@
 #include "engine/debug/logger.h"
 #include "engine/ecs/components/mesh_renderer.h"
 #include <stdexcept>
+#include <unordered_set>
 
 Application::Application(std::filesystem::path assetRoot) 
     : assetManager(assetRoot)
@@ -28,6 +29,10 @@ void Application::Run() {
         window.BeginFrame();
 
         renderer.BeginFrame();
+        
+        std::unordered_set<ECS_RID> rotatedEntities;
+        float rotationSpeed = 0.5f; // radians per second
+        
         EntityComponentView<MeshRenderer> meshRenderers = ecsManager.GetEntityComponentView<MeshRenderer>();
         for (auto [entityRuntimeId, meshRenderer] : meshRenderers) {
             Entity * entity = ecsManager.GetEntity(entityRuntimeId);
@@ -40,6 +45,17 @@ void Application::Run() {
                 Logger::Warning("Application", "Transform component not found for entity with runtime ID: " + std::to_string(entityRuntimeId));
                 continue;
             }
+            // rotate the mesh parent around the Y-axis over time
+            
+            Entity* parentEntity = ecsManager.GetParent(*entity);
+            if (parentEntity && rotatedEntities.find(parentEntity->entityRuntimeIdx) == rotatedEntities.end()) {
+                Transform* parentTransform = ecsManager.GetComponent<Transform>(*parentEntity);
+                if (parentTransform) {
+                    parentTransform->ChangeRotation(*parentTransform, Quaternion::EulerToQuaternion(0.0f, rotationSpeed, 0.0f));
+                    rotatedEntities.insert(parentEntity->entityRuntimeIdx);
+                }
+            }
+            
             renderer.SubmitMesh(
                 meshRenderer.meshId,
                 ecsManager.ComputeWorldTransform(*entity).matrix

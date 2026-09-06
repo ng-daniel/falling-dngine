@@ -84,12 +84,19 @@ void Renderer::ConfigureWindow() {
 }
 
 bool Renderer::Init(WindowManager& window) {
-    return device->Init(window);
+    if (!device->Init(window)) {
+        return false;
+    }
+    this->window = &window;
+    return true;
 }
 
 void Renderer::BeginFrame() {
     frameSubmissions.clear();
     frameData.commands.clear();
+    if (window) {
+        frameData.frame = debugCamera.Update(*window);
+    }
     device->BeginFrame();
 }
 
@@ -367,4 +374,3 @@ MeshRenderData* Renderer::GetOrCreateMeshRenderData(UUID meshId) {
     const auto insertionResult = meshCache.emplace(meshId, std::move(meshRenderData));
     return &insertionResult.first->second;
 }
-

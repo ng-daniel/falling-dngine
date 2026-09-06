@@ -172,8 +172,8 @@ bool OpenGLDevice::Init(WindowManager& window) {
         return false;
     }
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     return true;
 }
 
@@ -208,6 +208,7 @@ void OpenGLDevice::Render(const RenderData& renderData) {
         glUniformMatrix4fv(shaderProgram->modelUniform, 1, GL_FALSE, command.model.Data());
         glUniformMatrix4fv(shaderProgram->viewUniform, 1, GL_FALSE, renderData.frame.view.Data());
         glUniformMatrix4fv(shaderProgram->projectionUniform, 1, GL_FALSE, renderData.frame.projection.Data());
+        // glUniformMatrix4fv(shaderProgram->projectionUniform, 1, GL_FALSE, Matrix4(0.0f).Data());
         
         // retrieve and bind vertex buffers
         const OpenGLDeviceData* deviceData = static_cast<const OpenGLDeviceData*>(command.primitive->graphicsDeviceData.get());

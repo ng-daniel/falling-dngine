@@ -40,6 +40,8 @@ bool WindowManager::Init(const std::function<void()>& configure) {
     glfwSwapInterval(1);
 
     // set callbacks
+    glfwSetWindowUserPointer(handle, this);
+    glfwSetKeyCallback(handle, KeyCallback);
     glfwSetFramebufferSizeCallback(handle, FrameBufferSizeCallback);
     
     return true;
@@ -71,4 +73,27 @@ void WindowManager::EndFrame() {
     if (handle) {
         glfwSwapBuffers(handle);
     }
+}
+
+bool WindowManager::IsKeyDown(int key) const {
+    return key >= 0
+        && key <= GLFW_KEY_LAST
+        && keyStates[static_cast<std::size_t>(key)];
+}
+
+void WindowManager::GetFramebufferSize(int& width, int& height) const {
+    if (!handle) {
+        width = 0;
+        height = 0;
+        return;
+    }
+    glfwGetFramebufferSize(handle, &width, &height);
+}
+
+void WindowManager::KeyCallback(GLFWwindow* window, int key, int, int action, int) {
+    WindowManager* windowManager = static_cast<WindowManager*>(glfwGetWindowUserPointer(window));
+    if (!windowManager || key < 0 || key > GLFW_KEY_LAST) {
+        return;
+    }
+    windowManager->keyStates[static_cast<std::size_t>(key)] = action != GLFW_RELEASE;
 }

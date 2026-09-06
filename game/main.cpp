@@ -108,7 +108,7 @@ int main() {
     // 90 degree rotation along the Y-axis via quaternions
     Transform::SetRotation(
         *modelRootTransform,
-        Quaternion::EulerToQuaternion(30.0, 180.0, 30.0)
+        Quaternion::EulerToQuaternion(45.0, 180.0, 30.0)
     );
     
     std::vector<Entity*> children = ecsManager.GetChildren(*modelRootEntity);

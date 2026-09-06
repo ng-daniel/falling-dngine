@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "engine/utils/uuid.h"
+#include "engine/renderer/debug_camera.h"
 #include "engine/renderer/renderer_structures.h"
 #include "engine/renderer/graphics_device.h"
 #include "engine/utils/matrix.h"
@@ -38,6 +39,8 @@ public:
 private:
     AssetManager& assetManagerRef;
     std::unique_ptr<GraphicsDevice> device;
+    WindowManager* window = nullptr;
+    DebugCamera debugCamera;
 
     std::vector<RenderSubmission> frameSubmissions;
     RenderData frameData;

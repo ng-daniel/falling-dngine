@@ -270,14 +270,7 @@ bool Renderer::ResolveMaterial(
         return false;
     }
 
-    resolvedMaterial = {};
-    resolvedMaterial.materialId = material->id;
-    resolvedMaterial.baseColorFactor = material->baseColorFactor;
-    resolvedMaterial.metallicFactor = material->metallicFactor;
-    resolvedMaterial.roughnessFactor = material->roughnessFactor;
-    resolvedMaterial.occlusionFactor = material->occlusionFactor;
-    resolvedMaterial.normalFactor = material->normalFactor;
-    resolvedMaterial.emissiveFactor = material->emissiveFactor;
+    resolvedMaterial = BuildGraphicsDeviceMaterialData(material);
 
     const std::array<UUID, MATERIAL_TEXTURE_SLOT_COUNT> materialTextures = {
         material->baseColorTexture,

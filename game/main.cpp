@@ -95,20 +95,21 @@ int main() {
     /// MODEL BUILDER TEST
     /// ---------------------------------------------------------------
     
-    for (int x = 0; x < 10; ++x) {
-        for (int z = 0; z < 10; ++z) {
-            for (int y = 0; y < 10; ++y) {
+    float distance = 0.67f;
+    int gridSize = 10;
+    for (int x = 0; x < gridSize; ++x) {
+        for (int z = 0; z < gridSize; ++z) {
+            for (int y = 0; y < gridSize; ++y) {
                 Entity * modelRootEntity = ECSExtras::BuildEntityFromModel(app.GetAssetManager(), ecsManager, GameAssets::RYUJIN7_MODEL.GetUUID());
                 if (modelRootEntity) {
-                    Logger::Info("main", "Created model root entity with ID: " + std::to_string(modelRootEntity->entityId) + " and runtime idx: " + std::to_string(modelRootEntity->entityRuntimeIdx));
+                    // Logger::Info("main", "Created model root entity with ID: " + std::to_string(modelRootEntity->entityId) + " and runtime idx: " + std::to_string(modelRootEntity->entityRuntimeIdx));
                 }
                 ecsManager.Parent(*rootEntity, *modelRootEntity);
                 Transform  * modelRootTransform = ecsManager.GetComponent<Transform>(*modelRootEntity);
                 Transform::ChangePosition(
                     *modelRootTransform,
-                    Vector3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z))
+                    Vector3(static_cast<float>(x * distance), static_cast<float>(y * distance), static_cast<float>(z * distance))
                 );
-                // 90 degree rotation along the Y-axis via quaternions
                 Transform::SetRotation(
                     *modelRootTransform,
                     Quaternion::EulerToQuaternion(45.0, 180.0, 30.0)

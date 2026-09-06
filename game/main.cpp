@@ -95,8 +95,6 @@ int main() {
     /// MODEL BUILDER TEST
     /// ---------------------------------------------------------------
     
-    // spawn 100 models in a 10x10 horizontal grid
-
     for (int x = 0; x < 10; ++x) {
         for (int z = 0; z < 10; ++z) {
             for (int y = 0; y < 10; ++y) {

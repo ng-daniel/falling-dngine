@@ -1,6 +1,8 @@
 #include "engine/core/application.h"
 #include "engine/debug/logger.h"
 #include "engine/ecs/components/mesh_renderer.h"
+#include "engine/utils/random.h"
+
 #include <stdexcept>
 #include <unordered_set>
 
@@ -31,7 +33,7 @@ void Application::Run() {
         renderer.BeginFrame();
         
         std::unordered_set<ECS_RID> rotatedEntities;
-        float rotationSpeed = 0.5f; // radians per second
+        float rotationSpeed = 0.5f;
         
         EntityComponentView<MeshRenderer> meshRenderers = ecsManager.GetEntityComponentView<MeshRenderer>();
         for (auto [entityRuntimeId, meshRenderer] : meshRenderers) {
@@ -51,6 +53,7 @@ void Application::Run() {
             if (parentEntity && rotatedEntities.find(parentEntity->entityRuntimeIdx) == rotatedEntities.end()) {
                 Transform* parentTransform = ecsManager.GetComponent<Transform>(*parentEntity);
                 if (parentTransform) {
+                    rotationSpeed = Random::RandFloat(5.0f, 15.0f);
                     parentTransform->ChangeRotation(*parentTransform, Quaternion::EulerToQuaternion(0.0f, rotationSpeed, 0.0f));
                     rotatedEntities.insert(parentEntity->entityRuntimeIdx);
                 }

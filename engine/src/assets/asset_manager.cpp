@@ -107,10 +107,10 @@ Asset* AssetManager::RequestAsset(UUID id, Asset::AssetType expectedType)
         return nullptr;
     }
 
-    Logger::Info(
-        "AssetManager::RequestAsset",
-        "Asset with ID " + std::to_string(id) + " loaded and returned."
-    );
+    // Logger::Info(
+    //     "AssetManager::RequestAsset",
+    //     "Asset with ID " + std::to_string(id) + " loaded and returned."
+    // );
     return asset;
 }
 

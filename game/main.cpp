@@ -101,15 +101,15 @@ int main() {
     }
     ecsManager.Parent(*rootEntity, *modelRootEntity);
     Transform  * modelRootTransform = ecsManager.GetComponent<Transform>(*modelRootEntity);
-    // Transform::ChangePosition(
-    //     *modelRootTransform,
-    //     Vector3(0.0, 0.0, 1.0)
-    // );
-    // // 90 degree rotation along the Y-axis via quaternions
-    // Transform::SetRotation(
-    //     *modelRootTransform,
-    //     Quaternion::EulerToQuaternion(90.0, 0.0, 0.0)
-    // );
+    Transform::ChangePosition(
+        *modelRootTransform,
+        Vector3(0.0, -1.0, 0.0)
+    );
+    // 90 degree rotation along the Y-axis via quaternions
+    Transform::SetRotation(
+        *modelRootTransform,
+        Quaternion::EulerToQuaternion(30.0, 180.0, 30.0)
+    );
     
     std::vector<Entity*> children = ecsManager.GetChildren(*modelRootEntity);
     Logger::Info("main", "Number of children: " + std::to_string(children.size()));

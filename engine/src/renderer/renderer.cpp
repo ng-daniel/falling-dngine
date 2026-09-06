@@ -178,7 +178,14 @@ void Renderer::BuildDrawCommands() {
     
     // iterate through all mesh submissions and their primitives
     for (const RenderSubmission& submission : frameSubmissions) {
-        if (!submission.mesh || !submission.mesh->initialized) {
+        if (!submission.mesh) {
+            Logger::Warning(
+                "Renderer",
+                "Skipping submission with null mesh pointer."
+            );
+            continue;
+        }
+        if (!submission.mesh->initialized) {
             Logger::Warning(
                 "Renderer",
                 "Skipping uninitialized mesh " + std::to_string(submission.mesh->meshId) + "."

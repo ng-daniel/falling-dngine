@@ -19,6 +19,10 @@ public:
     const float* Data() const;
     float* Data();
 
+    float& operator[](std::size_t index) {
+        return elements[index];
+    }
+
 private:
     // column-major storage
     std::array<float, 16> elements;

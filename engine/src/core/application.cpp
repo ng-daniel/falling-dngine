@@ -42,7 +42,7 @@ void Application::Run() {
             }
             renderer.SubmitMesh(
                 meshRenderer.meshId,
-                transform->matrix
+                ecsManager.ComputeWorldTransform(*entity).matrix
             );
         }
         renderer.Render();

@@ -172,14 +172,14 @@ bool OpenGLDevice::Init(WindowManager& window) {
         return false;
     }
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
     return true;
 }
 
 void OpenGLDevice::BeginFrame() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OpenGLDevice::Render(const RenderData& renderData) {

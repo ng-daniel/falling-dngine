@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "engine/renderer/renderer_structures.h"
 #include "engine/core/window_manager.h"
@@ -10,9 +11,10 @@
 struct OpenGLConfig {};
 
 struct OpenGLDeviceData : IGraphicsDeviceData{
-    uint VAO;
-    uint VBO;
-    uint EBO;
+    uint VAO = 0;
+    uint VBO = 0;
+    uint EBO = 0;
+    std::uint32_t indexCount = 0;
 };
 
 struct OpenGLShaderProgram : IGraphicsDeviceShader {
@@ -27,7 +29,7 @@ public:
     void ConfigureWindow() override;
     bool Init(WindowManager& window) override;
     void BeginFrame() override;
-    void Render(RenderData& renderData) override;
+    void Render(const RenderData& renderData) override;
     void EndFrame() override;
     void Close() override;
 
@@ -38,11 +40,18 @@ public:
         const std::string& fragmentSource
     ) override;
     void DestroyShaderProgram(SPDEVICE_RID programId) override;
+
+    TDEVICE_RID CreateTexture(
+        const TextureAsset& texture,
+        const ImageAsset& image
+    ) override;
+    void DestroyTexture(TDEVICE_RID textureId) override;
     
 private:
     OpenGLConfig config;
     WindowManager* window = nullptr;
     std::unordered_map<SPDEVICE_RID, std::unique_ptr<OpenGLShaderProgram>> shaderPrograms;
+    std::unordered_set<TDEVICE_RID> textures;
     
     OpenGLShaderProgram * FindShaderProgram(SPDEVICE_RID programId);
 };

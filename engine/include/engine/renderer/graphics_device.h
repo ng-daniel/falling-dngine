@@ -14,7 +14,7 @@ public:
     virtual void Close() = 0;
 
     virtual void BeginFrame() = 0;
-    virtual void Render(RenderData& renderData) = 0;
+    virtual void Render(const RenderData& renderData) = 0;
     virtual void EndFrame() = 0;
 
     virtual void InitializeGPUBuffersForMesh(MeshRenderData& renderData, const MeshAsset * meshAsset) = 0;
@@ -24,4 +24,10 @@ public:
         const std::string& fragmentSource
     ) = 0;
     virtual void DestroyShaderProgram(SPDEVICE_RID programId) = 0;
+
+    virtual TDEVICE_RID CreateTexture(
+        const TextureAsset& texture,
+        const ImageAsset& image
+    ) = 0;
+    virtual void DestroyTexture(TDEVICE_RID textureId) = 0;
 };

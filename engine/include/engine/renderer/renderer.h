@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "engine/utils/uuid.h"
@@ -38,9 +39,18 @@ private:
     AssetManager& assetManagerRef;
     std::unique_ptr<GraphicsDevice> device;
 
+    std::vector<RenderSubmission> frameSubmissions;
     RenderData frameData;
     std::unordered_map<UUID, MeshRenderData> meshCache;
     std::unordered_map<UUID, ShaderProgramData> shaderCache;
+    std::unordered_map<UUID, TDEVICE_RID> textureCache;
 
     MeshRenderData* GetOrCreateMeshRenderData(UUID meshId);
+    TDEVICE_RID GetOrCreateTexture(UUID textureId);
+    bool ResolveMaterial(
+        UUID materialId,
+        SPDEVICE_RID& shaderProgramId,
+        GraphicsDeviceMaterialData& resolvedMaterial
+    );
+    void BuildDrawCommands();
 };

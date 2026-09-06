@@ -5,6 +5,9 @@
 #include "GLFW/glfw3.h"
 
 #include "engine/debug/logger.h"
+
+#include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -35,6 +38,51 @@ namespace {
         return 0;
     }
 
+    bool GetTextureFormats(int channelCount, GLint& internalFormat, GLenum& sourceFormat) {
+        if (channelCount == 1) {
+            internalFormat = GL_R8;
+            sourceFormat = GL_RED;
+            return true;
+        } else if (channelCount == 2) {
+            internalFormat = GL_RG8;
+            sourceFormat = GL_RG;
+            return true;
+        } else if (channelCount == 3) {
+            internalFormat = GL_RGB8;
+            sourceFormat = GL_RGB;
+            return true;
+        } else if (channelCount == 4) {
+            internalFormat = GL_RGBA8;
+            sourceFormat = GL_RGBA;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    GLint GetMagnificationFilter(TextureAsset::FilterType filter) {
+        return filter == TextureAsset::FilterType::Nearest ? GL_NEAREST : GL_LINEAR;
+    }
+
+    GLint GetMinificationFilter(TextureAsset::FilterType filter) {
+        switch (filter) {
+            case TextureAsset::FilterType::Nearest:
+            case TextureAsset::FilterType::Linear:
+            case TextureAsset::FilterType::NearestMipmapNearest:
+            case TextureAsset::FilterType::LinearMipmapNearest:
+            case TextureAsset::FilterType::NearestMipmapLinear:
+            case TextureAsset::FilterType::LinearMipmapLinear:
+                return static_cast<GLint>(filter);
+            case TextureAsset::FilterType::Undefined:
+                return GL_LINEAR_MIPMAP_LINEAR;
+        }
+        return GL_LINEAR_MIPMAP_LINEAR;
+    }
+
+    bool UsesMipmaps(GLint minificationFilter) {
+        return minificationFilter != GL_NEAREST && minificationFilter != GL_LINEAR;
+    }
+
     /**
      * @brief Initializes openGL buffers by
      * 1. Initializing device data
@@ -49,6 +97,11 @@ namespace {
 
         auto& vertices = primitive->vertices;
         auto& indices = primitive->indices;
+
+        if (indices.size() > static_cast<std::size_t>(std::numeric_limits<GLsizei>::max())) {
+            throw std::runtime_error("Primitive has too many indices for the graphics device.");
+        }
+        deviceData->indexCount = static_cast<std::uint32_t>(indices.size());
 
         // generate buffers
         glGenVertexArrays(1, &deviceData->VAO);
@@ -129,34 +182,27 @@ void OpenGLDevice::BeginFrame() {
     glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
 }
 
-void OpenGLDevice::Render(RenderData& renderData) {
-    for (RenderSubmission& submission : renderData.submissions) {
-        if (!submission.mesh) {
+void OpenGLDevice::Render(const RenderData& renderData) {
+    for (const DrawCommand& command : renderData.commands) {
+        if (!command.primitive || !command.primitive->graphicsDeviceData) {
             continue;
-        }
-
-        if (!submission.mesh->initialized) {
-            Logger::Error("OpenGLDevice", "Mesh " + std::to_string(submission.mesh->meshId) + " is not initialized.");
-            continue;
-        }
-
-        for (PrimitiveRenderData& primitive : submission.mesh->primitives) {
-            // Bind VAO and draw elements for each primitive
-            // OpenGLDeviceData * deviceData = static_cast<OpenGLDeviceData*>(primitive.graphicsDeviceData.get());
-            // if (deviceData) {
-            //     glBindVertexArray(deviceData->VAO);
-            //     glDrawElements(
-            //         GL_TRIANGLES,
-            //         primitive,
-            //         GL_UNSIGNED_INT, 0);
-            //     glBindVertexArray(0);
-            // }
-            // Logger::Info("OpenGLDevice", "Rendering mesh " + std::to_string(submission.mesh->meshId) + " primitive " + std::to_string(primitive.pIdx));
         }
     }
 }
 
 void OpenGLDevice::EndFrame() {
+}
+
+void OpenGLDevice::Close() {
+    for (const auto& [handle, shaderProgram] : shaderPrograms) {
+        glDeleteProgram(shaderProgram->programId);
+    }
+    shaderPrograms.clear();
+
+    for (const auto& textureId : textures) {
+        glDeleteTextures(1, &textureId);
+    }
+    textures.clear();
 }
 
 /**
@@ -221,14 +267,88 @@ void OpenGLDevice::DestroyShaderProgram(uint programId) {
     shaderPrograms.erase(shaderIt);
 }
 
-OpenGLShaderProgram * OpenGLDevice::FindShaderProgram(uint programId) {
-    const auto shaderIt = shaderPrograms.find(programId);
-    return shaderIt == shaderPrograms.end() ? nullptr : shaderIt->second.get();
+/**
+ * @brief Runs the OpenGL procedure for generating textures
+ * on the GPU
+ * 
+ * @param texture 
+ * @param image 
+ * @return TDEVICE_RID the openGL texture ID 
+ */
+TDEVICE_RID OpenGLDevice::CreateTexture(
+    const TextureAsset& texture,
+    const ImageAsset& image
+) {
+    // error checking
+    GLint internalFormat = 0;
+    GLenum sourceFormat = 0;
+    if (image.width <= 0 ||
+        image.height <= 0 ||
+        !GetTextureFormats(image.numChannels, internalFormat, sourceFormat))
+    {
+        Logger::Error("OpenGLDevice", "Cannot create a texture from invalid image dimensions or channels.");
+        return INVALID_TDEVICE_RID;
+    }
+    const std::size_t expectedDataSize = static_cast<std::size_t>(image.width)
+        * static_cast<std::size_t>(image.height)
+        * static_cast<std::size_t>(image.numChannels);
+    if (image.data.size() < expectedDataSize) {
+        Logger::Error("OpenGLDevice", "Cannot create a texture from incomplete image data.");
+        return INVALID_TDEVICE_RID;
+    }
+
+    // generate and bind texture
+    GLuint textureId = 0;
+    glGenTextures(1, &textureId);
+    if (textureId == 0) {
+        Logger::Error("OpenGLDevice", "OpenGL failed to allocate a texture.");
+        return INVALID_TDEVICE_RID;
+    }
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    // set texture parameters
+    const GLint minificationFilter = GetMinificationFilter(texture.min_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minificationFilter);
+    glTexParameteri(
+        GL_TEXTURE_2D,
+        GL_TEXTURE_MAG_FILTER,
+        GetMagnificationFilter(texture.mag_filter)
+    );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(texture.wrap_s));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(texture.wrap_t));
+
+    GLint previousUnpackAlignment = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        internalFormat,
+        image.width,
+        image.height,
+        0,
+        sourceFormat,
+        GL_UNSIGNED_BYTE,
+        image.data.data()
+    );
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
+
+    if (UsesMipmaps(minificationFilter)) {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+
+    // unbind texture and store in 
+    glBindTexture(GL_TEXTURE_2D, 0);
+    textures.emplace(textureId);
+    return textureId;
 }
 
-void OpenGLDevice::Close() {
-    for (const auto& [handle, shaderProgram] : shaderPrograms) {
-        glDeleteProgram(shaderProgram->programId);
+void OpenGLDevice::DestroyTexture(TDEVICE_RID textureId) {
+    const auto texture = textures.find(textureId);
+    if (texture == textures.end()) {
+        return;
     }
-    shaderPrograms.clear();
+
+    glDeleteTextures(1, &(*texture));
+    textures.erase(texture);
 }

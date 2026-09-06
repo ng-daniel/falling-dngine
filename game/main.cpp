@@ -41,26 +41,6 @@ int main() {
 
     AssetManager& assetManager = app.GetAssetManager();
 
-    MaterialAsset* modelMaterial = assetManager.RequestAsset<MaterialAsset>(
-        GameAssets::RYUJIN7_MATERIAL_MATERIAL
-    );
-    const ShaderAsset* basicVertexShader = assetManager.RequestAssetReadOnly<ShaderAsset>(
-        GameAssets::BASICVERT_SHADER
-    );
-    const ShaderAsset* basicFragmentShader = assetManager.RequestAssetReadOnly<ShaderAsset>(
-        GameAssets::BASICFRAG_SHADER
-    );
-    if (!modelMaterial || !basicVertexShader || !basicFragmentShader) {
-        throw std::runtime_error("Failed to load material shader inputs.");
-    }
-    const ShaderProgramData basicShaderProgram = MaterialShaderService::CompileMaterial(
-        *modelMaterial,
-        *basicVertexShader,
-        *basicFragmentShader
-    );
-    app.GetRenderer().RegisterShaderProgram(basicShaderProgram);
-    Logger::Info("main", "Finished compiling shader program with ID: " + std::to_string(basicShaderProgram.id));
-
     const ModelAsset * model = assetManager.RequestAssetReadOnly<ModelAsset>(GameAssets::RYUJIN7_MODEL.GetUUID()); // Example usage of RequestAsset
     Logger::Info("main", "Finished loading model asset with ID: " + std::to_string(model->id));
     Logger::Info("main", "Model has " + std::to_string(model->meshes.size()) + " meshes.");
@@ -144,6 +124,31 @@ int main() {
         Logger::Info("main", "World Transform: " + std::to_string(worldTransform.GetPosition().x) + ", " + std::to_string(worldTransform.GetPosition().y) + ", " + std::to_string(worldTransform.GetPosition().z));
         Logger::Info("main", "World Rotation: " + std::to_string(worldTransform.GetRotation().x) + ", " + std::to_string(worldTransform.GetRotation().y) + ", " + std::to_string(worldTransform.GetRotation().z) + ", " + std::to_string(worldTransform.GetRotation().w));
     }
+
+    /// MATERIAL SHADER COMPILATION TEST
+    /// ---------------------------------------------------------------
+
+    MaterialAsset* modelMaterial = assetManager.RequestAsset<MaterialAsset>(
+        GameAssets::RYUJIN7_MATERIAL_MATERIAL
+    );
+    const ShaderAsset* basicVertexShader = assetManager.RequestAssetReadOnly<ShaderAsset>(
+        GameAssets::BASICVERT_SHADER
+    );
+    const ShaderAsset* basicFragmentShader = assetManager.RequestAssetReadOnly<ShaderAsset>(
+        GameAssets::BASICFRAG_SHADER
+    );
+    if (!modelMaterial || !basicVertexShader || !basicFragmentShader) {
+        throw std::runtime_error("Failed to load material shader inputs.");
+    }
+    const ShaderProgramData basicShaderProgram = MaterialShaderService::CompileMaterial(
+        *modelMaterial,
+        *basicVertexShader,
+        *basicFragmentShader
+    );
+    app.GetRenderer().RegisterShaderProgram(basicShaderProgram);
+    Logger::Info("main", "Finished compiling shader program with ID: " + std::to_string(basicShaderProgram.id));
+
+
     app.Run();
 
     return 0;

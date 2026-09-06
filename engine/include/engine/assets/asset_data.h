@@ -21,14 +21,14 @@ struct ShaderAsset : public Asset {
 };
 
 struct ImageAsset : public Asset {
-    int width;
-    int height;
-    int numChannels;
+    int width = 0;
+    int height = 0;
+    int numChannels = 0;
     std::vector<unsigned char> data;
 };
 
 struct TextureAsset : public Asset {
-    UUID image;
+    UUID image = INVALID_UUID;
 
     enum class FilterType {
         Undefined = 0,
@@ -58,7 +58,7 @@ struct MaterialAsset : public Asset {
         Unlit,
         Custom
     };
-    MaterialType materialType;
+    MaterialType materialType = MaterialType::PBRMetallicRoughness;
     Vector4 baseColorFactor = Vector4(1.0f);
 
     float metallicFactor = 1.0f;
@@ -68,15 +68,15 @@ struct MaterialAsset : public Asset {
 
     Vector3 emissiveFactor = Vector3(0.0f);
 
-    UUID baseColorTexture;
-    UUID metallicRoughnessTexture;
-    UUID normalTexture;
-    UUID occlusionTexture;
-    UUID emissiveTexture;
+    UUID baseColorTexture = INVALID_UUID;
+    UUID metallicRoughnessTexture = INVALID_UUID;
+    UUID normalTexture = INVALID_UUID;
+    UUID occlusionTexture = INVALID_UUID;
+    UUID emissiveTexture = INVALID_UUID;
 
     // Runtime-only link to a ShaderProgramData. Asset serialization deliberately
     // does not include this field.
-    UUID runtimeShader = 0;
+    UUID runtimeShader = INVALID_UUID;
 };
 
 struct Vertex {

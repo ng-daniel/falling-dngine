@@ -95,7 +95,7 @@ int main() {
     /// MODEL BUILDER TEST
     /// ---------------------------------------------------------------
     
-    float distance = 0.67f;
+    float distance = 1.67f;
     int gridSize = 10;
     for (int x = 0; x < gridSize; ++x) {
         for (int z = 0; z < gridSize; ++z) {

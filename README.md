@@ -21,6 +21,17 @@ couple other projects I've been wanting to make.
 
 For now, you can inspect the code (main execution is in `game/main.cpp`) and/or run the demo shown in the clip above.
 
+## Performance Notes
+
+I've just been testing performance with a simple FPS tracker + logger and the game demo.
+The demo is a simple character model I made in Blender, ~400 triangles and 8 meshes, instantiated many
+times to form a cube structure.
+
+Each model consists of a parent entity and 8 entities with mesh components, resulting in 9 entities per instantiation.
+
+Debug builds run `1000` models (`9000` entities) at 35 FPS. \
+Release builds run `4096` models (`36864` entities) at 70 FPS.
+
 ## How to Run the Demo
 
 These instructions target Debian/Ubuntu Linux. I haven't tried it on a Windows machine yet (sorry!).

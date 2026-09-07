@@ -19,7 +19,7 @@ Now that I've finished the renderer, completing the big 3 systems required to
 put a mesh on the screen, I'm probably gonna split my attention across a
 couple other projects I've been wanting to make.
 
-For now, you can run the demo shown in the clip above with these steps:
+For now, you can inspect the code (main execution is in `game/main.cpp`) and/or run the demo shown in the clip above.
 
 ## How to Run the Demo
 

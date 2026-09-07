@@ -71,3 +71,6 @@ Testing/
 
 # imgui
 imgui.ini
+
+# environment
+.env

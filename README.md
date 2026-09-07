@@ -50,20 +50,20 @@ git clone https://github.com/microsoft/vcpkg.git
 export VCPKG_ROOT=/absolute/path/to/vcpkg
 ```
 
-Clone, configure, and build the game target:
+Clone the repository, then configure and build a debug version of the game:
 
 ```bash
 git clone https://github.com/ng-daniel/falling-dngine.git falling-engine
 cd falling-engine
-cmake --preset vcpkg
-cmake --build build --target game --parallel
+cmake --preset debug
+cmake --build build/debug --target game
 ```
 
 *To build all executables (such as the asset browser/inspector and some
-engine tests), just run this instead of targetting game specifically:*
+engine tests), run this instead of targeting the game specifically:*
 
 ```bash
-cmake --build build
+cmake --build build/debug
 ```
 
 The configure step reads `vcpkg.json` and installs the C++ dependencies
@@ -71,7 +71,16 @@ The configure step reads `vcpkg.json` and installs the C++ dependencies
 repository root, run:
 
 ```bash
-./build/game/game
+./build/debug/game/game
+```
+
+For an optimized release build, use the release preset and its corresponding
+build directory:
+
+```bash
+cmake --preset release
+cmake --build build/release --target game
+./build/release/game/game
 ```
 
 Run the executable from the repository root because the demo loads assets from

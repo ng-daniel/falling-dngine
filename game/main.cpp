@@ -96,7 +96,7 @@ int main() {
     /// ---------------------------------------------------------------
     
     float distance = 1.67f;
-    int gridSize = 10;
+    int gridSize = 16;
     for (int x = 0; x < gridSize; ++x) {
         for (int z = 0; z < gridSize; ++z) {
             for (int y = 0; y < gridSize; ++y) {

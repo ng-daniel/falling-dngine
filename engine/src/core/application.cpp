@@ -28,6 +28,9 @@ Application::Application(std::filesystem::path assetRoot)
 Application::~Application() = default;
 
 void Application::Run() {
+    Time::SetFpsTrackingInterval(1.0f);
+    Time::ToggleFPSTracking(true);
+    Time::ToggleFPSLogging(true);
     Time::Reset();
 
     while (!window.ShouldClose()) {

@@ -75,8 +75,8 @@ repository root, run:
 ```
 
 Run the executable from the repository root because the demo loads assets from
-`./game/assets`. Use <kbd>W</kbd>/<kbd>A</kbd>/<kbd>S</kbd>/<kbd>D</kbd> to move,
-<kbd>Q</kbd>/<kbd>E</kbd> to move vertically, and the arrow keys to look around.
+`./game/assets`. Use `WASD` to move,
+`Q/E` to move vertically, and the arrow keys to look around.
 Close the window to exit.
 
 
@@ -93,6 +93,7 @@ Completed
 - renderer, (debug) camera (DONE!!!)
 
 MVP Remaining Items
+- profiler (to identify bottlenecks)
 - input system
 - scripting and custom game logic
 - physics

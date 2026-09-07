@@ -53,7 +53,7 @@ void Application::Run() {
             if (parentEntity && rotatedEntities.find(parentEntity->entityRuntimeIdx) == rotatedEntities.end()) {
                 Transform* parentTransform = ecsManager.GetComponent<Transform>(*parentEntity);
                 if (parentTransform) {
-                    rotationSpeed = Random::RandFloat(5.0f, 15.0f);
+                    rotationSpeed = Random::RandFloat(2.0f, 2.5f);
                     parentTransform->ChangeRotation(*parentTransform, Quaternion::EulerToQuaternion(0.0f, rotationSpeed, 0.0f));
                     rotatedEntities.insert(parentEntity->entityRuntimeIdx);
                 }

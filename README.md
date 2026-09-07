@@ -1,9 +1,5 @@
 # Falling Engine
 
-
-https://github.com/user-attachments/assets/cab2e675-682e-45f6-83d7-2f6cbc5deb61
-
-
 A small and performant data-oriented C++ game engine with:
 1. Centralized Asset Database
 2. Sparse-Set Entity Component System

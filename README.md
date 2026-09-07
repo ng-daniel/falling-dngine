@@ -25,12 +25,19 @@ For now, you can inspect the code (main execution is in `game/main.cpp`) and/or 
 
 I've just been testing performance with a simple FPS tracker + logger and the game demo.
 The demo is a simple character model I made in Blender, ~400 triangles and 8 meshes, instantiated many
-times to form a cube structure.
+times to form a cube structure. Each model is also rotated by some amount of degrees randomly selected
+from a narrow range.
 
-Each model consists of a parent entity and 8 entities with mesh components, resulting in 9 entities per instantiation.
+Each model consists of a parent entity and 8 entities with mesh components, resulting in 9 entities per instantiation. Each parent entity's transform gets rotated, and the raw world transform is computed for
+each mesh-containing child entity before being submitted to the renderer.
 
 Debug builds run `1000` models (`9000` entities) at 35 FPS. \
-Release builds run `4096` models (`36864` entities) at 70 FPS.
+Release builds run `4096` models (`36864` entities) at 65 FPS.
+
+Machine Specs
+- GPU: NVIDIA GeForce RTX 4060
+- CPU: Intel Core i7-13620H
+- Display: 1920x1200 165hz (tests ran with maximized window)
 
 ## How to Run the Demo
 

@@ -71,7 +71,7 @@ export VCPKG_ROOT=/absolute/path/to/vcpkg
 Clone the repository, then configure and build a debug version of the game:
 
 ```bash
-git clone https://github.com/ng-daniel/falling-dngine.git falling-engine
+git clone https://github.com/ng-daniel/falling-engine.git falling-engine
 cd falling-engine
 cmake --preset debug
 cmake --build build/debug --target game

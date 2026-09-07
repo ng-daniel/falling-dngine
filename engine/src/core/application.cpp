@@ -2,6 +2,7 @@
 #include "engine/debug/logger.h"
 #include "engine/ecs/components/mesh_renderer.h"
 #include "engine/utils/random.h"
+#include "engine/utils/time.h"
 
 #include <stdexcept>
 #include <unordered_set>
@@ -27,7 +28,10 @@ Application::Application(std::filesystem::path assetRoot)
 Application::~Application() = default;
 
 void Application::Run() {
+    Time::Reset();
+
     while (!window.ShouldClose()) {
+        Time::Update();
         window.BeginFrame();
 
         renderer.BeginFrame();

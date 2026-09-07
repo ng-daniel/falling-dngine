@@ -37,6 +37,7 @@ add_library(engine
 
     src/utils/uuid.cpp
     src/utils/random.cpp
+    src/utils/time.cpp
     src/utils/vector.cpp
     src/utils/quaternion.cpp
     src/utils/matrix.cpp

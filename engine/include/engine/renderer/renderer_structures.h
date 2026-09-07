@@ -51,6 +51,9 @@ enum class MaterialTextureSlot : std::size_t {
     Count
 };
 
+/**
+ * @brief Number of material texture slots
+ */
 constexpr std::size_t MATERIAL_TEXTURE_SLOT_COUNT =
     static_cast<std::size_t>(MaterialTextureSlot::Count);
 

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include "engine/utils/uuid.h"
@@ -37,20 +36,24 @@ public:
     UUID RegisterShaderProgram(const ShaderProgramData& shaderProgram);
 
 private:
+    // dependencies to external systems
     AssetManager& assetManagerRef;
-    std::unique_ptr<GraphicsDevice> device;
     WindowManager* window = nullptr;
     DebugCamera debugCamera;
 
+    // graphics device and caches
+    std::unique_ptr<GraphicsDevice> device;
     std::vector<RenderSubmission> frameSubmissions;
+
     RenderData frameData;
+    
     std::unordered_map<UUID, MeshRenderData> meshCache;
     std::unordered_map<UUID, ShaderProgramData> shaderCache;
     std::unordered_map<UUID, TDEVICE_RID> textureCache;
 
     MeshRenderData* GetOrCreateMeshRenderData(UUID meshId);
     TDEVICE_RID GetOrCreateTexture(UUID textureId);
-    bool ResolveMaterial(
+    bool BuildMaterialShaderData(
         UUID materialId,
         SPDEVICE_RID& shaderProgramId,
         GraphicsDeviceMaterialData& resolvedMaterial

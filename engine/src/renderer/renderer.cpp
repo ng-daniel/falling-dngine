@@ -212,7 +212,7 @@ void Renderer::BuildDrawCommands() {
             // create and store new material-shader binding if it doesn't exist
             if (resolvedMaterials.find(primitive.materialId) == resolvedMaterials.end()) {
                 MaterialShaderBinding binding;
-                bool result = ResolveMaterial(
+                bool result = BuildMaterialShaderData(
                     primitive.materialId,
                     std::get<SHADER_SLOT>(binding),
                     std::get<MATERIAL_SLOT>(binding)
@@ -242,7 +242,18 @@ void Renderer::BuildDrawCommands() {
     }
 }
 
-bool Renderer::ResolveMaterial(
+/**
+ * @brief Given material ID, fetches all assets the material ID depends on,
+ * builds a GraphicsDeviceMaterialData, and returns the shader program ID and material data
+ * in place at the provided references
+ * 
+ * @param materialId 
+ * @param shaderProgramId 
+ * @param resolvedMaterial 
+ * @return true 
+ * @return false 
+ */
+bool Renderer::BuildMaterialShaderData(
     UUID materialId,
     SPDEVICE_RID& shaderProgramId,
     GraphicsDeviceMaterialData& resolvedMaterial
